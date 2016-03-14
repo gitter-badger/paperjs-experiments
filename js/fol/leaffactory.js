@@ -94,10 +94,10 @@ var LeafFactory = function(pos, updateList, delay, hidecenter) {
                     this._delay = 0;
 
                     // TODO: Remove this debug!
-                    if (this.cbfajutain) {
-                        // console.log('fajutagem!');
-                        this.cbfajutain();
-                    }
+                    // if (this.cbfajutain) {
+                    //     // console.log('fajutagem!');
+                    //     this.cbfajutain();
+                    // }
 
                     // this._centershape.bringToFront();
                     this._centershape.visible = true;
@@ -138,11 +138,11 @@ var LeafFactory = function(pos, updateList, delay, hidecenter) {
                         this._path.strokeWidth = defaultstyle.strokeWidth;
                         this._leafstate = 'centerfadeout';
 
-                        // TODO: Remove this debug!
-                        if (this.cbfajutaout) {
-                            // console.log('fajutagem!');
-                            this.cbfajutaout();
-                        }
+                        // // TODO: Remove this debug!
+                        // if (this.cbfajutaout) {
+                        //     // console.log('fajutagem!');
+                        //     this.cbfajutaout();
+                        // }
 
                     }
                     break;

@@ -107,16 +107,16 @@ var FoLFactory = function (updateList) {
                 }
 
                 // TODO: Remove this debug!
-                if (i == 0) {
-                    c.cbfajutain = function () {
-                        rootleaf._path.strokeColor = 'gold';
-                    };
-                }
-                if (i == angles.length - 1) {
-                    c.cbfajutaout = function () {
-                        rootleaf._path.strokeColor = 'white';
-                    };
-                }
+                // if (i == 0) {
+                //     c.cbfajutain = function () {
+                //         rootleaf._path.strokeColor = 'gold';
+                //     };
+                // }
+                // if (i == angles.length - 1) {
+                //     c.cbfajutaout = function () {
+                //         rootleaf._path.strokeColor = 'white';
+                //     };
+                // }
             }
 
             return newleafs;
@@ -211,7 +211,7 @@ function onMouseMove(event) {
     }
 }
 
-// var level = 15;
+var level = 4;
 // LEAF_DELAY = LEAF_DELAY / level;
 // LEAF_DELAY = 0.3;
 

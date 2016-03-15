@@ -21,8 +21,9 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 		_showbindings: true,
 		_wheelpath: null,
 		_wheelstate: '',
-		_bindings: null,
 		_rpm: 0,
+		_pieces: null,
+		_visible: true,
 
 		// PUBLIC VARS
 		// gets wheels's center position within layer
@@ -32,41 +33,68 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
         // sets wheels's center position within layer
         set center(pos) {
             this._center = pos;
-            this._wheelpath.position = pos + project.activeLayer.position;
+            this._wheelpath.position = pos;
         },
+		// gets wheel and binded pieces visibility
+		get visible() {
+			return this._visible;
+		},
+		// sets wheel and binded pieces visibility
+		set visible(isvisible) {
+			this._pieces.forEach(function (p) {
+				p.obj.visible = isvisible;
+				p.bindingpath.visible = wheel._showbindings;
+			});
+			this._wheelpath.visible = isvisible;
+			this._visible = isvisible;
+		},
 
 		// PRIVATE METHODS
-		_setBindingPos: function (binding, offsetinc) {
-			binding.offset += offsetinc;
+		_setPiecePos: function (piece, offsetinc) {
+			piece.offset += offsetinc;
 
-			if (binding.offset >= 1) {
-				binding.offset = binding.offset - Math.floor(binding.offset);
+			if (piece.offset >= 1) {
+				piece.offset = piece.offset - Math.floor(piece.offset);
 			}
 			// console.log('binding.offset = ' + binding.offset);
-
-			binding.path.position = this._wheelpath.getPointAt(
-				binding.offset * this._wheelpath.length);
+			var pbind = this._wheelpath.getPointAt(piece.offset * this._wheelpath.length);
+			// sets piece position
+			piece.obj.setTargetPos(piece.target, pbind);
+			// sets binding point position
+			piece.bindingpath.position = pbind;
 		},
 		// PUBLIC METHODS
-		bind: function (rope, ending, angle) {
+		// binds a piece (wheel or rope) to its target (string) at angle on this wheel
+		bind: function (piece, target, angle) {
 			var anglevec = new Point(this._radius, 0);
 			// gets angle relative offset
 			angle = angle > 0 ? angle % 360 : (angle % 360) + 360;
 			offset = (angle / 360);
+			var pbind = this._wheelpath.getPointAt(offset * this._wheelpath.length);
 
-			console.log('offsetabs = ' + offset);
-			console.log('this._wheelpath.length = ' + this._wheelpath.length);
-			console.log('this._wheelpath.position = ' + this._wheelpath.position.toString());
+			// console.log('offsetabs = ' + offset);
+			// console.log('this._wheelpath.length = ' + this._wheelpath.length);
+			// console.log('this._wheelpath.position = ' + this._wheelpath.position.toString());
 
-			var binding = {
-				path: new Path.Circle(this._wheelpath.getPointAt(
-					offset * this._wheelpath.length), 5),
-				offset: offset,
+			var npiece = {
+				obj: piece,
+				target: target,
+				bindingpath: new Path.Circle(pbind, 3),
+				offset: offset
 			};
+			piece.setTargetPos(target, pbind);
 			// creates path for binding marker
-			binding.path.style = bindingpoint_sty;
-			binding.visible = this._showbindings;
-			this._bindings.push(binding);
+			npiece.bindingpath.style = bindingpoint_sty;
+			npiece.bindingpath.visible = this._showbindings;
+			// adds piece to binded pieces
+			this._pieces.push(npiece);
+		},
+		// sets this wheels position depending on target
+		setTargetPos: function (target, pos) {
+			switch (target) {
+				case 'center': default:
+					this.center = pos;
+			}
 		},
 		// starts wheel
 		run: function (rpm) {
@@ -84,13 +112,11 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 					break;
 
 				case 'run':
-					// revolutions per minute
-					var rpm = 10;
 					// offset increment
 					var offsetinc = delta / (60 / this._rpm);
 
-					this._bindings.forEach(function (b) {
-						wheel._setBindingPos(b, offsetinc);
+					this._pieces.forEach(function (p) {
+						wheel._setPiecePos(p, offsetinc);
 					});
 
 					break;
@@ -112,12 +138,12 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
             this._wheelpath = new Path.Circle(pos, radius);
 			// wheel animation state
 			this._wheelstate = 'run';
-			// bindings list
-			this._bindings = [];
 			// shows binding points
 			this._showbindings = showbindings;
 			// revolutions per minute
 			this._rpm = 0;
+			// binded pieces
+			this._pieces = [];
 
 			// sets wheel style
 			this._wheelpath.style = wheel_sty;

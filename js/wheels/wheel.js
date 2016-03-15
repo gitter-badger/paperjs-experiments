@@ -12,7 +12,7 @@ var bindingpoint_sty = {
 };
 
 // creates wheel objects
-var WheelFactory = function (radius, pos, updateList, showbindings) {
+var WheelFactory = function (radius, pos, updateList, raster, showbindings) {
 	var wheel = {
 		// PRIVATE VARS
 		_updateList: null,
@@ -24,6 +24,7 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 		_rpm: 0,
 		_pieces: null,
 		_visible: true,
+		_raster: null,
 
 		// PUBLIC VARS
 		// gets wheels's center position within layer
@@ -62,6 +63,10 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 			piece.obj.setTargetPos(piece.target, pbind);
 			// sets binding point position
 			piece.bindingpath.position = pbind;
+
+			// this._raster.setPixel(pbind, 'yellow');
+			// this._raster.setImageData(piece.bindingraster.getImageData(), pbind);
+			// this._raster.drawImage(piece.bindingraster.canvas, pbind - piece.bindingraster.bounds.size / 2);
 		},
 		// PUBLIC METHODS
 		// binds a piece (wheel or rope) to its target (string) at angle on this wheel
@@ -88,6 +93,15 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 			npiece.bindingpath.visible = this._showbindings;
 			// adds piece to binded pieces
 			this._pieces.push(npiece);
+
+			var p = new Path.Circle(pbind, 5);
+			p.style = {
+				fillColor: 'yellow'
+			}
+			// npiece.bindingraster = p.rasterize();
+			npiece.bindingraster = npiece.bindingpath.rasterize();
+			npiece.bindingraster.visible = false;
+			p.remove();
 		},
 		// sets this wheels position depending on target
 		setTargetPos: function (target, pos) {
@@ -117,6 +131,7 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 
 					this._pieces.forEach(function (p) {
 						wheel._setPiecePos(p, offsetinc);
+						// p.bindingpath.rasterize();
 					});
 
 					break;
@@ -125,7 +140,7 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 			}
 		},
 		// wheel object initialization
-        init: function (radius, pos, updateList, showbindings) {
+        init: function (radius, pos, updateList, raster, showbindings) {
 			showbindings = typeof showbindings !== 'undefined' ? showbindings : true;
 
             // sets update list reference
@@ -144,6 +159,8 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 			this._rpm = 0;
 			// binded pieces
 			this._pieces = [];
+			// raster to draw lines
+			this._raster = raster;
 
 			// sets wheel style
 			this._wheelpath.style = wheel_sty;
@@ -153,7 +170,7 @@ var WheelFactory = function (radius, pos, updateList, showbindings) {
 		}
 	}
 
-	wheel.init(radius, pos, updateList, showbindings);
+	wheel.init(radius, pos, updateList, raster, showbindings);
 
 	return wheel;
 }

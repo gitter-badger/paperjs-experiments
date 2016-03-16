@@ -25,6 +25,7 @@ var WheelFactory = function (radius, pos, updateList, raster, showbindings) {
 		_pieces: null,
 		_visible: true,
 		_raster: null,
+		_drawingpath: null,
 
 		// PUBLIC VARS
 		// gets wheels's center position within layer
@@ -56,6 +57,12 @@ var WheelFactory = function (radius, pos, updateList, raster, showbindings) {
 
 			if (piece.offset >= 1) {
 				piece.offset = piece.offset - Math.floor(piece.offset);
+				this._drawingpath.smooth();
+
+				var r = this._drawingpath.rasterize();
+				this._raster.drawImage(r.canvas, this._drawingpath.position - r.bounds.size / 2);
+				r.remove();
+				this._drawingpath.removeSegments(0, this._drawingpath.segments.length-1);
 			}
 			// console.log('binding.offset = ' + binding.offset);
 			var pbind = this._wheelpath.getPointAt(piece.offset * this._wheelpath.length);
@@ -67,6 +74,9 @@ var WheelFactory = function (radius, pos, updateList, raster, showbindings) {
 			// this._raster.setPixel(pbind, 'yellow');
 			// this._raster.setImageData(piece.bindingraster.getImageData(), pbind);
 			// this._raster.drawImage(piece.bindingraster.canvas, pbind - piece.bindingraster.bounds.size / 2);
+			if (this._showbindings) {
+				this._drawingpath.add(pbind);
+			}
 		},
 		// PUBLIC METHODS
 		// binds a piece (wheel or rope) to its target (string) at angle on this wheel
@@ -84,7 +94,7 @@ var WheelFactory = function (radius, pos, updateList, raster, showbindings) {
 			var npiece = {
 				obj: piece,
 				target: target,
-				bindingpath: new Path.Circle(pbind, 3),
+				bindingpath: new Path.Circle(pbind, 10),
 				offset: offset
 			};
 			piece.setTargetPos(target, pbind);
@@ -94,14 +104,14 @@ var WheelFactory = function (radius, pos, updateList, raster, showbindings) {
 			// adds piece to binded pieces
 			this._pieces.push(npiece);
 
-			var p = new Path.Circle(pbind, 5);
-			p.style = {
-				fillColor: 'yellow'
-			}
-			// npiece.bindingraster = p.rasterize();
-			npiece.bindingraster = npiece.bindingpath.rasterize();
-			npiece.bindingraster.visible = false;
-			p.remove();
+			// var p = new Path.Circle(pbind, 5);
+			// p.style = {
+			// 	fillColor: 'yellow'
+			// }
+			// // npiece.bindingraster = p.rasterize();
+			// npiece.bindingraster = npiece.bindingpath.rasterize();
+			// npiece.bindingraster.visible = false;
+			// p.remove();
 		},
 		// sets this wheels position depending on target
 		setTargetPos: function (target, pos) {
@@ -161,6 +171,10 @@ var WheelFactory = function (radius, pos, updateList, raster, showbindings) {
 			this._pieces = [];
 			// raster to draw lines
 			this._raster = raster;
+
+			this._drawingpath = new Path();
+			this._drawingpath.strokeColor = 'yellow';
+			this._drawingpath.strokeWidth = 1;
 
 			// sets wheel style
 			this._wheelpath.style = wheel_sty;

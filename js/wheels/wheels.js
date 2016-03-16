@@ -2,6 +2,7 @@
 
 // imports
 var WheelFactory = this.WheelFactory;
+var RopeFactory = this.RopeFactory;
 
 // globals
 var wheels = null;
@@ -18,9 +19,16 @@ var WheelsFactory = function (updateList) {
 		layer: null,
 
 		// PUBLIC METHODS
+		// creates a rope
+		createRope: function(renderline) {
+			var r = RopeFactory(this._updateList, this._raster, renderline);
+
+			this._raster.bringToFront();
+			return r;
+		},
 		// creates a wheel
-		createWheel: function(radius, pos) {
-			var w = WheelFactory(radius, pos, this._updateList, this._raster);
+		createWheel: function(radius, pos, showbindings) {
+			var w = WheelFactory(radius, pos, this._updateList, this._raster, showbindings);
 			this._wheels.push(w);
 
 			this._raster.bringToFront();
@@ -35,19 +43,18 @@ var WheelsFactory = function (updateList) {
 			this._updateList = updateList;
 			// wheels list
 			this._wheels = [];
-			// raster for drawing
-			this._raster = new Raster();
 
 			// create a new layer for fol
 			this.layer = new Layer();
 			// activates wheels layer for project
 			this.layer.activate();
+			// raster for drawing
+			this._raster = new Raster();
 
 			// adds wheels to update list
 			// this._updateList.push(this);
 
 			this._raster.size = view.size;
-			this._raster.position = view.center;
 		}
 	}
 
@@ -67,25 +74,37 @@ function onResize(event) {
 	wheels.layer.position = view.center;
 }
 
-// Main function
-function main() {
+function earthPlanetOrbit(a, b) {
 	var multi = 1;
     wheels = WheelsFactory(updateList);
 
-	var w = wheels.createWheel(90, new Point(0, 0));
-	var w1 = wheels.createWheel(50, new Point(0, 0));
-	var w2 = wheels.createWheel(20, new Point(0, 0));
-	w.bind(w1, 'center', 90);
-	w1.bind(w2, 'center', 90);
-	w.run(10 * multi);
-	w1.run(56 * multi);
-	// w.visible = false;
+	var earthorbit = wheels.createWheel(300, new Point(0, 0), true);
+	var planetorbit = wheels.createWheel(400, new Point(0, 0), true);
+	var rope = wheels.createRope(30 * multi);
 
-	var w3 = wheels.createWheel(180, new Point(90, 0));
-	var w4 = wheels.createWheel(80, new Point(0, 0));
-	w3.bind(w4, 'center', 90);
-	w3.run(3 * multi);
-	// w3.visible = false;
+	var angle = 0;
+
+	earthorbit.bind(rope, 'segment0', 90 + angle);
+	planetorbit.bind(rope, 'segment1', 90 + angle);
+
+	earthorbit.run(a * 2 * multi);
+	planetorbit.run(b * 2 * multi);
+
+	// earthorbit.visible = false;
+	// planetorbit.visible = false;
+}
+
+// Main function
+function main() {
+	// venus
+	earthPlanetOrbit(13, 8);
+	// jupiter
+	// earthPlanetOrbit(12, 1);
+	// mars
+	// earthPlanetOrbit(2, 1);
+	// saturn - neptune
+	// earthPlanetOrbit(28, 5);
+	// earthPlanetOrbit(19, 11);
 }
 
 main();

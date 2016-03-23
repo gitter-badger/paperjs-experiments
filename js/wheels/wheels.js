@@ -97,14 +97,14 @@ function earthPlanetOrbit(a, b) {
 // Main function
 function main() {
 	// venus
-	earthPlanetOrbit(13, 8);
+	// earthPlanetOrbit(13, 8);
 	// jupiter
 	// earthPlanetOrbit(12, 1);
 	// mars
 	// earthPlanetOrbit(2, 1);
 	// saturn - neptune
 	// earthPlanetOrbit(28, 5);
-	// earthPlanetOrbit(19, 11);
+	earthPlanetOrbit(19, 11);
 }
 
 main();
